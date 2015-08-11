@@ -49,7 +49,7 @@ PSt1= [[0 for j in range(Y)]for i in range(X)]
 PSt2= [[0 for j in range(Y)]for i in range(X)]
 Ws= [[0 for j in range(Y)]for i in range(X)]
 
-def init(self):
+def init():
     print("Khoi tao so lieu")
     for k in range(K):
         sgoc=sin(Goc[k])        
@@ -74,6 +74,80 @@ def init(self):
             PS[i][j]=P0
             Ws[i][j]=0;
             PSt1[i][j]=PS[i][j]
+
+def DuDoan():
+    for k in range(K):
+        for i in range (1, X-1):
+            for j in range (1, Y-1):
+                Ut2[k][i][j]=-M*(PHI[k][i+1][j]-PHI[k][i][j])/dex \
+                        -M1*((Ut1[k][i][j]+Ut1[k][i+1][j])*(Ut1[k][i+1][j]-Ut1[k][i][j])+(Ut1[k][i][j]+Ut1[k][i-1][j])*(Ut1[k][i][j]-Ut1[k][i-1][j])) \
+                        +F*(Vt1[k][i][j]+Vt1[k][i][j-1]+Vt1[k][i+1][j]+Vt1[k][i+1][j-1])/4 \
+                        -M1*((Vt1[k][i][j]+Vt1[k][i+1][j])*(Ut1[k][i][j+1]-Ut1[k][i][j])+(Vt1[k][i][j-1]+Vt1[k][i+1][j-1])*(Ut1[k][i][j-1]-Ut1[k][i][j]))
+                Vt2[k][i][j]= -M*(PHI[k][i][j+1]-PHI[k][i][j])/dex \
+                        - M1*((Ut1[k][i][j]+Ut1[k][i][j+1])*(Vt1[k][i+1][j]-Vt1[k][i][j])+(Ut1[k][i-1][j]+Ut1[k][i-1][j+1])*(Vt1[k][i][j]-Vt1[k][i-1][j])) \
+                        - M1*((Vt1[k][i][j]+Vt1[k][i][j+1])*(Vt1[k][i][j+1]-Vt1[k][i][j])+(Vt1[k][i][j]+Vt1[k][i][j-1])*(Vt1[k][i][j]-Vt1[k][i][j-1])) \
+                        -F*(Ut1[k][i][j]+Ut1[k][i-1][j]+Ut1[k][i][j+1]+Vt1[k][i-1][j+1])/4 \
+                if k=(K-1):                
+                    P1= (PN[k]+PN[k-1])/2
+                    P2=25
+                    P5=(PN[k]-P2)/(2*(P1-P2))
+                    Ut2[k][i][j]= Ut2[k][i][j] \
+                        -((Wt[k-1][i+1][j]+Wt[k-1][i][j])*P5*(Ut1[k][i][j]-Ut1[k-1][i][j]))/(PN[k]-PN[k-1])
+                    Vt2[k][i][j]= Vt2[k][i][j] \
+                                -((Wt[k-1][i][j+1]+Wt[k-1][i][j])*P5*(Vt1[k][i][j]-Vt1[k-1][i][j]))/(PN[k]-PN[k-1])
+                    TE_t2[k][i][j]=0
+                    Q_t2[k][i][j]=0
+                else:
+                    U1= (Ut1[k][i+1][j]+Ut1[k+1][i+1][j])/2
+                    U2= (Ut1[k][i][j]+Ut1[k+1][i][j])/2
+                    V1= (Vt1[k][i][j+1]+Vt1[k+1][i][j+1])/2
+                    V2=(Vt1[k][i][j]+Vt1[k+1][i][j])/2
+                    TEt2[k][i][j]=-2*M1*(U1*(TE_t1[k][i+1][j]-TE_t1[k][i][j]) \
+                                -U2*(TE_t1[k][i][j]-TE_t1[k][i-1][j]) \
+                                +V1*(TE_t1[k][i][j+1]-TE_t1[k][i][j]) \
+                                -V2*(TE_t1[k][i][j]-TE_t1[k][i][j-1]))
+                    Qt2[k][i][j]=-2*M1*(U1*(Q_t1[k][i+1][j]-Q_t1[k][i][j]) \
+                                -U2*(Q_t1[k][i][j]-Q_t1[k][i-1][j]) \
+                                +V1*(Q_t1[k][i][j+1]-Q_t1[k][i][j]) \
+                                -V2*(Q_t1[k][i][j]-Q_t1[k][i][j-1]))
+                        if k==0:
+                            P1= (PN[k+1]+PN[k])/2
+                            P2= (PN[k+2]+PN[k+1])/2
+                            W9= (Wt[k+1][i][j]*P1+Wt[k][i][j]*P2)/(P1+P2)
+                            W1= ((Wt[k][i+1][j]+Wt[k][i][j])+(Ws[i][j]+Ws[i+1][j]))/4
+                            W2=((Wt[k][i][j+1]+Wt[k][i][j])+(Ws[i][j+1]+Ws[i][j]))/4
+                            Ut2[k][i][j]=Ut2[k][i][j]-W1*(Ut1[k+1][i][j]-Ut1[k][i][j])/(PN[k+1]-PN[k])
+                            Vt2[k][i][j]=Vt2[k][i][j]-W2*(Vt1[k+1][i][j]-Vt1[k][i][j])/(PN[k+1]-PN[k])
+                            TEt2[k][i][j]=TE_t2[k][i][j]-Wt[k][i][j]*(TE_t1[k+1][i][j]-TE_t1[k][i][j])/(PN[k+1]-PN[k])
+                            Qt2[k][i][j]= Q_t2[k][i][j]-Wt[k][i][j]*(Q_t1[k+1][i][j]-Q_t1[k][i][j])/(PN[k+1]-PN[k])
+                            PSt2[i][j]=-2*M1*(Ut1[k][i+1][j]*(PSt1[i+1][j]-PSt1[i][j]) \
+                                -Ut1[k][i][j]*(PS_t1[i][j]-PS_t1[i-1][j]) \
+                                +Vt1[k][i][j+1]*(PS_t1[i][j+1]-PS_t1[i][j]) \
+                                -Vt1[k][i][j]*(PS_t1[i][j]-PS_t1[i][j-1]))
+                            PS_t2[i][j]=PS_t2[i][j]+W9-(((Ut1[k+1][i+1][j]-Ut1[k+1][i][j]) \
+                                +(Vt1[k+1][i][j+1]-Vt1[k+1][i][j])+(Ut1[k][i+1][j]-Ut1[k][i][j]) \
+                                +(Vt1[k][i][j+1]-Vt1[k][i][j]))*2*M1)*(PS_t1[i][j]-900)
+                        else:
+                            P1= (PN[k-1]+PN[k])/2
+                            P2= (PN[k]+PN[k+1])/2
+                            Ut2[k][i][j]= Ut2[k][i][j]-(((Wt[k][i+1][j]+Wt[k][i][j])*(PN[k]-P2) \
+                                +(Wt[k+1][i+1][j]+Wt[k+1][i][j])*(P1-PN[k]))/(2*(P1-P2)) \
+                                *((Ut1[k-1][i][j]-Ut1[k][i][j])*(PN[k]-PN[k+1])/(PN[k-1]-PN[k])) \
+                                +((Ut1[k][i][j]-Ut1[k+1][i][j])*(PN[k-1]-PN[k])/(PN[k]-PN[k+1])))/(PN[k-1]-PN[k+1])
+                                 
+                            Vt2[k][i][j]= Vt2[k][i][j]-(((Wt[k][i][j+1]+Wt[k][i][j])*(PN[k]-P2) \
+                                +(Wt[k+1][i][j+1]+Wt[k+1][i][j])*(P1-PN[k]))/(2*(P1-P2)) \
+                                *((Vt1[k-1][i][j]-Vt1[k][i][j])*(PN[k]-PN[k+1])/(PN[k-1]-PN[k])) \
+                                +((Vt1[k][i][j]-Vt1[k+1][i][j])*(PN[k-1]-PN[k])/(PN[k]-PN[k+1])))/(PN[k-1]-PN[k+1])
+                            
+                            TEt2[k][i][j]=TEt2[k][i][j]-Wt[k][i][j]*((TEt1[k-1][i][j]-TEt1[k][i][j]) \
+                                *(PN[k]-PN[k+1])/(PN[k-1]-PN[k])+(TEt1[k][i][j]-TEt[k+1][i][j])*(PN[k+1]-PN[k])/(PN[k]-PN[k+1]))/(PN[k-1]-PN[k+1])
+                            
+                            Qt2[k][i][j]= Qt2[k][i][j]-Wt[k][i][j]*((Qt1[k-1][i][j]-Qt1[k][i][j])* \
+                                (PN[k]-PN[k+1])/(PN[k-1]-PN[k])+(Qt1[k][i][j]-Qt1[k+1][i][j])* \
+                                (PN[k-1]-PN[k])/(PN[k]-PN[k+1]))/(PN[k-1]-PN[k+1])
+                            
+                                
     print("Khoi tao thanh cong")
 if __name__ == '__main__':
     pass
