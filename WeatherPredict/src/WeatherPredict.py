@@ -3,29 +3,32 @@ Created on Aug 10, 2015
 
 @author: ngo
 
+
 '''
+from __future__ import division
 from math import pi, sin, cos
+
 X=50
 Y=40
 K=5
-R=287
-CP=1005
-M=1
+R=287.0
+CP=1005.0
+M=1.0
 N=50
-PN=[150, 400, 650, 900, 1000]
-P0=1000
-det=1200
+PN=[1000.0, 900.0, 650.0, 300.0, 150.0]
+P0=900.0
+det=1200.0
 det1= 2*det
-dex=100000
+dex=100000.0
 F=14.584*(10**(-5))
 NO_OF_DECIMAL=3
-t=[18, 8, -41, -87, -233]
+t=[18.0, 8.0, -41.0, -87.0, -233.0]
 Goc=[pi/12, pi/3, 2*pi/3, 8*pi/9, 35*pi/36]
-Gio=[5, 10.8, 18, 20.2, 19.1]
-Zcao=[110, 980, 4940, 7880, 14000]
+Gio=[5.0, 10.8, 18, 20.2, 19.1]
+Zcao=[110.0, 980.0, 4940.0, 7880.0, 14000.0]
 M1= M/(4*det)
 RC=R/CP
-dataPath="C:\Users\ngo\Desktop\temp"
+#dataPath="C:\Users\ngo\Desktop\temp"
 
 Ut=[[[0 for j in range(Y)]for i in range(X)]for k in range(K)]
 Ut1=[[[0 for j in range(Y)]for i in range(X)]for k in range(K)]
@@ -74,7 +77,7 @@ def init():
     for i in range(X):
         for j in range(Y):
             PS[i][j]=P0
-            Ws[i][j]=0;
+            Ws[i][j]=0
             PS_t1[i][j]=PS[i][j]
     print("Khoi tao thanh cong")
 
@@ -123,9 +126,9 @@ def DuDoan():
                         Vt2[k][i][j]=Vt2[k][i][j]-W2*(Vt1[k+1][i][j]-Vt1[k][i][j])/(PN[k+1]-PN[k])
                         TE_t2[k][i][j]=TE_t2[k][i][j]-Wt[k][i][j]*(TE_t1[k+1][i][j]-TE_t1[k][i][j])/(PN[k+1]-PN[k])
                         Q_t2[k][i][j]= Q_t2[k][i][j]-Wt[k][i][j]*(Q_t1[k+1][i][j]-Q_t1[k][i][j])/(PN[k+1]-PN[k])
-                        PS_t2[i][j]=-2*M1*(Ut1[k][i+1][j]*(PS_t1[i+1][j]-PS_t1[i][j]) \
-                            -Ut1[k][i][j]*(PS_t1[i][j]-PS_t1[i-1][j]) \
-                            +Vt1[k][i][j+1]*(PS_t1[i][j+1]-PS_t1[i][j]) \
+                        PS_t2[i][j]=-2*M1*(Ut1[k][i+1][j]*(PS_t1[i+1][j]-PS_t1[i][j])
+                            -Ut1[k][i][j]*(PS_t1[i][j]-PS_t1[i-1][j])
+                            +Vt1[k][i][j+1]*(PS_t1[i][j+1]-PS_t1[i][j])
                             -Vt1[k][i][j]*(PS_t1[i][j]-PS_t1[i][j-1]))
                         PS_t2[i][j]=PS_t2[i][j]+W9-(((Ut1[k+1][i+1][j]-Ut1[k+1][i][j]) \
                             +(Vt1[k+1][i][j+1]-Vt1[k+1][i][j])+(Ut1[k][i+1][j]-Ut1[k][i][j]) \
@@ -161,7 +164,7 @@ def DuDoan():
                 Vt[k][i][j]=Vt1[k][i][j]
                 Vt1[k][i][j]=Vt2[k][i][j]
                 TE_t[k][i][j]=TE_t1[k][i][j]
-                TE_t[k][i][j]=TE_t1[k][i][j]
+                TE_t1[k][i][j]=TE_t2[k][i][j]
                 Q_t[k][i][j]=Q_t1[k][i][j]
                 Q_t1[k][i][j]=Q_t2[k][i][j]
     for i in range(1, X-1):
@@ -198,14 +201,12 @@ def ChuanDoan():
                     PP1= PN[k-1]-PN[k+1]
                     PP2= PN[k-1]-PN[k]
                     PP3= PN[k]-PN[k+1]
-                    PHI[k][i][j]=(((R/Ro*TV*((PN[k]/P0)**RC)*PP1+PHI[k-1][i][j]*PP3/PP2 \
-                                -PHI[k+1][i][j]*PP2/PP3))/(PP3/PP2-PP2/PP3))
-                    V_TB=-M*((Ut1[k][i+1][j]-Ut1[k][i][j]) \
-                            +(Vt1[k][i][j+1]-Vt1[k][i][j]) \
-                            +(Ut1[k+1][i+1][j]-Ut1[k+1][i][j]) \
+                    PHI[k][i][j]=(R/Ro*TV*((PN[k]/P0)**RC)*PP1+PHI[k-1][i][j]*PP3/PP2-PHI[k+1][i][j]*PP2/PP3)/(PP3/PP2-PP2/PP3)
+                    V_TB=-M*((Ut1[k][i+1][j]-Ut1[k][i][j])
+                            +(Vt1[k][i][j+1]-Vt1[k][i][j])
+                            +(Ut1[k+1][i+1][j]-Ut1[k+1][i][j])
                             +(Vt1[k+1][i][j+1]-Vt1[k+1][i][j]))/(2*dex)
-                    Wt[k][i][j]=(-V_TB*PP1+Wt[k-1][i][j]*PP3/PP2-Wt[k+1][i][j]*PP2/PP1) \
-                            /(PP3/PP2- PP2/PP3)
+                    Wt[k][i][j]=(-V_TB*PP1+Wt[k-1][i][j]*PP3/PP2-Wt[k+1][i][j]*PP2/PP1)/(PP3/PP2- PP2/PP3)
     P4=(PN[1]+PN[2])/2
     for i in range(1,X-1):
         for j in range(1,Y-1):
@@ -213,13 +214,29 @@ def ChuanDoan():
             Ws[i][j]=Wt[1][i][j]+VTS*(P4- PN[1])
 def printResult():
     print("U=")
+    print3D(K,X,Y,Ut2)
     print("V=")
+    print3D(K,X,Y,Vt2)
     print("TE=")
+    print3D(K,X,Y,TE_t2)
     print("Q=")
+    print3D(K,X,Y,Q_t2)
     print("Wt=")
+    print3D(K,X,Y,Wt)
     print("PHI=")
+    print3D(K,X,Y,PHI)
     print("PS=")
+    print2D(X, Y, PS_t2)
+def print3D(k, i, j, a=[[[]]]):
+    for k in range(K):
+        print("k=%d" %(k+1))
+        print2D(i, j, a[k])
 
+def print2D(i, j, a=[[]]):
+    for i in range (X):
+        for j in range (Y):
+            print ([i][j])
+        print("\n")
 if __name__ == '__main__':
     print("CHUONG TRINH DU DOAN VA CHUAN DOAN THOI TIET")
     print("-------------------------------------------")
