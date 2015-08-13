@@ -7,14 +7,14 @@ Created on Aug 10, 2015
 '''
 from __future__ import division
 from math import pi, sin, cos
-
+import time
 X=50
 Y=40
 K=5
 R=287.0
 CP=1005.0
 M=1.0
-N=50
+N=8
 PN=[1000.0, 900.0, 650.0, 300.0, 150.0]
 P0=900.0
 det=1200.0
@@ -64,9 +64,9 @@ def init():
         else: Ptb=(PN[k]+PN[k+1])/2
         for i in range(X):
             for j in range(Y):
-                Ut[k][i][j]=Gio[k]*cgoc
-                Vt[k][i][j]= Gio[k]*sgoc
-                TE_t[k][i][j]= (Tt*((1000/Ptb)**0.286))
+                Ut[k][i][j]=round(Gio[k]*cgoc, 3)
+                Vt[k][i][j]= round(Gio[k]*sgoc, 3)
+                TE_t[k][i][j]= round((Tt*((1000/Ptb)**0.286)), 3)
                 Q_t[k][i][j]=0
                 PHI[k][i][j]=Zcao[k]
                 Wt[k][i][j]=0
@@ -74,6 +74,7 @@ def init():
                 Vt1[k][i][j]=Vt[k][i][j]
                 TE_t1[k][i][j]=TE_t[k][i][j]
                 Q_t1[k][i][j]=Q_t[k][i][j]
+        # time.sleep(2)
     for i in range(X):
         for j in range(Y):
             PS[i][j]=P0
@@ -89,18 +90,20 @@ def DuDoan():
                         -M1*((Ut1[k][i][j]+Ut1[k][i+1][j])*(Ut1[k][i+1][j]-Ut1[k][i][j])+(Ut1[k][i][j]+Ut1[k][i-1][j])*(Ut1[k][i][j]-Ut1[k][i-1][j])) \
                         +F*(Vt1[k][i][j]+Vt1[k][i][j-1]+Vt1[k][i+1][j]+Vt1[k][i+1][j-1])/4 \
                         -M1*((Vt1[k][i][j]+Vt1[k][i+1][j])*(Ut1[k][i][j+1]-Ut1[k][i][j])+(Vt1[k][i][j-1]+Vt1[k][i+1][j-1])*(Ut1[k][i][j-1]-Ut1[k][i][j]))
+                Ut2[k][i][j]=round(Ut2[k][i][j], 3)
                 Vt2[k][i][j]= -M*(PHI[k][i][j+1]-PHI[k][i][j])/dex \
                         - M1*((Ut1[k][i][j]+Ut1[k][i][j+1])*(Vt1[k][i+1][j]-Vt1[k][i][j])+(Ut1[k][i-1][j]+Ut1[k][i-1][j+1])*(Vt1[k][i][j]-Vt1[k][i-1][j])) \
                         - M1*((Vt1[k][i][j]+Vt1[k][i][j+1])*(Vt1[k][i][j+1]-Vt1[k][i][j])+(Vt1[k][i][j]+Vt1[k][i][j-1])*(Vt1[k][i][j]-Vt1[k][i][j-1])) \
                         -F*(Ut1[k][i][j]+Ut1[k][i-1][j]+Ut1[k][i][j+1]+Vt1[k][i-1][j+1])/4
+                Vt2[k][i][j]=round(Vt2[k][i][j], 3)
                 if k==(K-1):
                     P1= (PN[k]+PN[k-1])/2
                     P2=25
                     P5=(PN[k]-P2)/(2*(P1-P2))
-                    Ut2[k][i][j]= Ut2[k][i][j] \
-                        -((Wt[k-1][i+1][j]+Wt[k-1][i][j])*P5*(Ut1[k][i][j]-Ut1[k-1][i][j]))/(PN[k]-PN[k-1])
-                    Vt2[k][i][j]= Vt2[k][i][j] \
-                                -((Wt[k-1][i][j+1]+Wt[k-1][i][j])*P5*(Vt1[k][i][j]-Vt1[k-1][i][j]))/(PN[k]-PN[k-1])
+                    Ut2[k][i][j]= Ut2[k][i][j]-((Wt[k-1][i+1][j]+Wt[k-1][i][j])*P5*(Ut1[k][i][j]-Ut1[k-1][i][j]))/(PN[k]-PN[k-1])
+                    Ut2[k][i][j]=round(Ut2[k][i][j], 3)
+                    Vt2[k][i][j]= Vt2[k][i][j]-((Wt[k-1][i][j+1]+Wt[k-1][i][j])*P5*(Vt1[k][i][j]-Vt1[k-1][i][j]))/(PN[k]-PN[k-1])
+                    Vt2[k][i][j]=round(Vt2[k][i][j], 3)
                     TE_t2[k][i][j]=0
                     Q_t2[k][i][j]=0
                 else:
@@ -112,10 +115,12 @@ def DuDoan():
                                 -U2*(TE_t1[k][i][j]-TE_t1[k][i-1][j]) \
                                 +V1*(TE_t1[k][i][j+1]-TE_t1[k][i][j]) \
                                 -V2*(TE_t1[k][i][j]-TE_t1[k][i][j-1]))
+                    TE_t2[k][i][j]=round(TE_t2[k][i][j], 3)
                     Q_t2[k][i][j]=-2*M1*(U1*(Q_t1[k][i+1][j]-Q_t1[k][i][j]) \
                                 -U2*(Q_t1[k][i][j]-Q_t1[k][i-1][j]) \
                                 +V1*(Q_t1[k][i][j+1]-Q_t1[k][i][j]) \
                                 -V2*(Q_t1[k][i][j]-Q_t1[k][i][j-1]))
+                    Q_t2[k][i][j]=round(Q_t2[k][i][j], 3)
                     if k==0:
                         P1= (PN[k+1]+PN[k])/2
                         P2= (PN[k+2]+PN[k+1])/2
@@ -123,16 +128,22 @@ def DuDoan():
                         W1= ((Wt[k][i+1][j]+Wt[k][i][j])+(Ws[i][j]+Ws[i+1][j]))/4
                         W2=((Wt[k][i][j+1]+Wt[k][i][j])+(Ws[i][j+1]+Ws[i][j]))/4
                         Ut2[k][i][j]=Ut2[k][i][j]-W1*(Ut1[k+1][i][j]-Ut1[k][i][j])/(PN[k+1]-PN[k])
+                        Ut2[k][i][j]=round(Ut2[k][i][j], 3)
                         Vt2[k][i][j]=Vt2[k][i][j]-W2*(Vt1[k+1][i][j]-Vt1[k][i][j])/(PN[k+1]-PN[k])
+                        Vt2[k][i][j]=round(Vt2[k][i][j], 3)
                         TE_t2[k][i][j]=TE_t2[k][i][j]-Wt[k][i][j]*(TE_t1[k+1][i][j]-TE_t1[k][i][j])/(PN[k+1]-PN[k])
+                        TE_t2[k][i][j]=round(TE_t2[k][i][j], 3)
                         Q_t2[k][i][j]= Q_t2[k][i][j]-Wt[k][i][j]*(Q_t1[k+1][i][j]-Q_t1[k][i][j])/(PN[k+1]-PN[k])
+                        Q_t2[k][i][j]=round(Q_t2[k][i][j], 3)
                         PS_t2[i][j]=-2*M1*(Ut1[k][i+1][j]*(PS_t1[i+1][j]-PS_t1[i][j])
                             -Ut1[k][i][j]*(PS_t1[i][j]-PS_t1[i-1][j])
                             +Vt1[k][i][j+1]*(PS_t1[i][j+1]-PS_t1[i][j])
                             -Vt1[k][i][j]*(PS_t1[i][j]-PS_t1[i][j-1]))
+                        PS_t2[i][j]=round(PS_t2[i][j], 3)
                         PS_t2[i][j]=PS_t2[i][j]+W9-(((Ut1[k+1][i+1][j]-Ut1[k+1][i][j]) \
                             +(Vt1[k+1][i][j+1]-Vt1[k+1][i][j])+(Ut1[k][i+1][j]-Ut1[k][i][j]) \
                             +(Vt1[k][i][j+1]-Vt1[k][i][j]))*2*M1)*(PS_t1[i][j]-900)
+                        PS_t2[i][j]=round(PS_t2[i][j], 3)
                     else:
                         P1= (PN[k-1]+PN[k])/2
                         P2= (PN[k]+PN[k+1])/2
@@ -140,18 +151,19 @@ def DuDoan():
                             +(Wt[k+1][i+1][j]+Wt[k+1][i][j])*(P1-PN[k]))/(2*(P1-P2)) \
                             *((Ut1[k-1][i][j]-Ut1[k][i][j])*(PN[k]-PN[k+1])/(PN[k-1]-PN[k])) \
                             +((Ut1[k][i][j]-Ut1[k+1][i][j])*(PN[k-1]-PN[k])/(PN[k]-PN[k+1])))/(PN[k-1]-PN[k+1])
-
+                        Ut2[k][i][j]=round(Ut2[k][i][j], 3)
                         Vt2[k][i][j]= Vt2[k][i][j]-(((Wt[k][i][j+1]+Wt[k][i][j])*(PN[k]-P2) \
                             +(Wt[k+1][i][j+1]+Wt[k+1][i][j])*(P1-PN[k]))/(2*(P1-P2)) \
                             *((Vt1[k-1][i][j]-Vt1[k][i][j])*(PN[k]-PN[k+1])/(PN[k-1]-PN[k])) \
                             +((Vt1[k][i][j]-Vt1[k+1][i][j])*(PN[k-1]-PN[k])/(PN[k]-PN[k+1])))/(PN[k-1]-PN[k+1])
-
+                        Vt2[k][i][j]=round(Vt2[k][i][j], 3)
                         TE_t2[k][i][j]=TE_t2[k][i][j]-Wt[k][i][j]*((TE_t1[k-1][i][j]-TE_t1[k][i][j]) \
                             *(PN[k]-PN[k+1])/(PN[k-1]-PN[k])+(TE_t1[k][i][j]-TE_t[k+1][i][j])*(PN[k+1]-PN[k])/(PN[k]-PN[k+1]))/(PN[k-1]-PN[k+1])
-
+                        TE_t2[k][i][j]=round(TE_t2[k][i][j], 3)
                         Q_t2[k][i][j]= Q_t2[k][i][j]-Wt[k][i][j]*((Q_t1[k-1][i][j]-Q_t1[k][i][j])* \
                             (PN[k]-PN[k+1])/(PN[k-1]-PN[k])+(Q_t1[k][i][j]-Q_t1[k+1][i][j])* \
                             (PN[k-1]-PN[k])/(PN[k]-PN[k+1]))/(PN[k-1]-PN[k+1])
+                        Q_t2[k][i][j]=round(Q_t2[k][i][j], 3)
     for k in range(K):
         for i in range(1,X-1):
             for j in range (1, Y-1):
@@ -188,30 +200,39 @@ def ChuanDoan():
                             +(Vt1[k][i][j+1]-Vt1[k][i][j]))*P2 \
                             +((Ut1[k+1][i+1][j]-Ut1[k+1][i][j]) \
                             +(Vt1[k+1][i][j+1]-Vt1[k+1][i][j]))*P1)/(dex*(P1+P2))
+                    V_TB=round(V_TB,3)
                     PA3= PN[k+1]-P3
                     PA2= PN[k]-PN[k+1]
                     PA1=PN[k]-P3
                     Wt[k][i][j]=(-V_TB*PA1+(Ws[i][j]*PA3/PA2-Wt[k+1][i][j]*PA2/PA3))/(PA3/PA2-PA2/PA3)
+                    Wt[k][i][j]=round(Wt[k][i][j], 3)
                     PHI[k][i][j]=(PHI[k+1][i][j]+R/Ro*TV*((PN[k]/P0)**RC)*(-PA2))
+                    PHI[k][i][j]=round(PHI[k][i][j], 3)
                 elif k==(K-1):
                     PA0= PN[k]-PN[k-1]
                     PHI[k][i][j]=(PHI[k-1][i][j]+R/Ro*TV*((PN[k]/P0)**RC)*PA0)
+                    PHI[k][i][j]=round(PHI[k][i][j], 3)
                     Wt[k][i][j]=0
                 else:
                     PP1= PN[k-1]-PN[k+1]
                     PP2= PN[k-1]-PN[k]
                     PP3= PN[k]-PN[k+1]
                     PHI[k][i][j]=(R/Ro*TV*((PN[k]/P0)**RC)*PP1+PHI[k-1][i][j]*PP3/PP2-PHI[k+1][i][j]*PP2/PP3)/(PP3/PP2-PP2/PP3)
+                    PHI[k][i][j]=round(PHI[k][i][j], 3)
                     V_TB=-M*((Ut1[k][i+1][j]-Ut1[k][i][j])
                             +(Vt1[k][i][j+1]-Vt1[k][i][j])
                             +(Ut1[k+1][i+1][j]-Ut1[k+1][i][j])
                             +(Vt1[k+1][i][j+1]-Vt1[k+1][i][j]))/(2*dex)
+                    V_TB=round(V_TB,3)
                     Wt[k][i][j]=(-V_TB*PP1+Wt[k-1][i][j]*PP3/PP2-Wt[k+1][i][j]*PP2/PP1)/(PP3/PP2- PP2/PP3)
+                    Wt[k][i][j]=round(Wt[k][i][j], 3)
     P4=(PN[1]+PN[2])/2
     for i in range(1,X-1):
         for j in range(1,Y-1):
             VTS= M*((Ut1[1][i+1][j]-Ut1[1][i][j])+(Vt1[1][i][j+1]-Vt1[1][i][j]))/dex
+            VTS=round(VTS,3)
             Ws[i][j]=Wt[1][i][j]+VTS*(P4- PN[1])
+            Ws[i][j]=round( Ws[i][j],3)
 def printResult():
     print("U=")
     print3D(K,X,Y,Ut2)
@@ -235,13 +256,16 @@ def print3D(k, i, j, a=[[[]]]):
 def print2D(i, j, a=[[]]):
     for i in range (X):
         for j in range (Y):
-            print ([i][j])
-        print("\n")
+            # print (a[i][j])
+            print(a[i][j], end=" ")
+        print()
 if __name__ == '__main__':
     print("CHUONG TRINH DU DOAN VA CHUAN DOAN THOI TIET")
     print("-------------------------------------------")
     init()
+    print3D(K,X,Y,Ut1)
     for n in range(N):
+        print(det1)
         det1=2*det
         if n==0: det1=det
         DuDoan()
@@ -250,3 +274,4 @@ if __name__ == '__main__':
         print("Ket thuc viec chuan doan")
         print("Ket thuc tinh toan cho buoc thoi gian %d" %(n+1))
     print("Ket thuc tinh toan")
+    printResult()
